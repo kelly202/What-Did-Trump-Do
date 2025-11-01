@@ -4,6 +4,8 @@ from flask import Flask, render_template # import Flask which is the web framewo
 from dotenv import load_dotenv # import load_dotenv to load environment variables
 import os # import os to access environment variables
 
+
+
 load_dotenv() # load environment variables from .env file
 
 app = Flask(__name__) # create a Flask app instance, where to look for templates and static files
