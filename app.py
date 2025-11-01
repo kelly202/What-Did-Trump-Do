@@ -74,7 +74,9 @@ def get_news_articles(query, lang='en', page_size=5):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching news from NewsAPI: {e}")
         return "" # return empty string on error instead of None because gemini expects a string, otherwise gemini_analysis would crash
-    
+
+def Finhub_charts(): # placeholder for Finhub charts function
+    pass  
 app = Flask(__name__) # create a Flask app instance, where to look for templates and static files
 
 @app.route('/') # when someone visits homepage do the below function
@@ -83,8 +85,8 @@ def home():
     return "Welcome to.... What did Trump do?"  # temporary response for testing 
 
 if __name__ == '__main__':
-    print(genai.list_models()) # print available models in gemini
-
+    #print(genai.list_models()) # print available models in gemini
+    # testing the functions on terminal
     news_text = get_news_articles("Donald Trump tech") # fetch news articles related to Donald Trump and tech sector
     print("------------Fetched News Articles----------")
     print(news_text) # print fetched news articles 
