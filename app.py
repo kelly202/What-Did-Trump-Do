@@ -1,13 +1,15 @@
 # main Flask app file
 
-from flask import Flask, request, jsonify # import Flask which is the web framework
+from flask import Flask
+import requests, jsonify # import Flask which is the web framework
 from dotenv import load_dotenv # import load_dotenv to load environment variables
 import os # import os to access environment variables
 import google.generativeai as genai
 
+load_dotenv() # load api keys from .env file for security
+
 genai.configure(api_key=os.getenv("GENAI_API_KEY")) # what this does it set the API key for gemini so that we can make requests to the API
 model = genai.GenerativeModel('gemini-1.5-pro') # specify the model version to use
-load_dotenv() # why load api key from .env file
 
 
 def gemini_analysis(news_articles, sector): # takes in news articles and sector as input, might change to take only 1 article later
@@ -51,7 +53,28 @@ def gemini_analysis(news_articles, sector): # takes in news articles and sector 
         return None
 
 
+NEWS_API_BASE_URL = "https://newsapi.org/v2/everything"
 
+def get_news_articles(query, lang='en', page_size=5):
+    # sets up parameters that will be sent to NewsAPI to fetch news articles
+    params = {
+        "q": query, # what to search for
+        "language": lang, # language of the news articles
+        "pageSize": page_size, # number of articles to fetch
+        "apiKey": os.getenv("NEWS_API_KEY"), # use api key from .env file
+        "sortBy": "relevancy" # sort articles by relevancy
+    }
+    try:
+        response = requests.get(NEWS_API_BASE_URL, params=params)
+        response.raise_for_status() # checks if response has HTTP errors ( 401 or 404 not found), raises exception if so
+        articles = response.json().get('articles', []) # gets list of articles (".get()") and converts to python dictionary (.json()) default to empty list if none found
+        # Concatenate titles and descriptions for Gemini
+        combined_news = "\n\n".join([f"Title: {a['title']}\nDescription: {a['description']}" for a in articles if a['title'] and a['description']]) #  may add more fields later, for more detailed analysis
+        return combined_news # returns the combined news articles as a single string separated by 2 new lines
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching news from NewsAPI: {e}")
+        return "" # return empty string on error instead of None because gemini expects a string, otherwise gemini_analysis would crash
+    
 app = Flask(__name__) # create a Flask app instance, where to look for templates and static files
 
 @app.route('/') # when someone visits homepage do the below function
