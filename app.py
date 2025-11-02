@@ -28,8 +28,8 @@ def get_gemini_analysis(news_articles, sector): # takes in news articles and sec
         4. 4 popular example stocks in this sector that are most likely to be affected, along with their predicted short-term movement (e.g., AAPL: Up, GOOG: Consolidate).
         5. A concise, paragraph-long summary suitable for a financial news report and retail investor.
 
-    Format your response strictly as JSON and do not include anything else but the JSON object. Be sure to use the following structure and exclude
-    the ```json and ``` markdown code block markers:
+    Format your response strictly as JSON and do not include anything else but the JSON object. Be sure to use the following structure
+    and Do not include any surrounding characters, backticks (```), or formatting outside of the JSON object itself:
     {{
       "sentiment": "...",
       "whySentiment": "...",
@@ -61,30 +61,30 @@ def get_gemini_analysis(news_articles, sector): # takes in news articles and sec
         print("=== END RAW RESPONSE ===")
 
         # Clean the response - remove markdown code blocks
-        # cleaned_text = gemini_raw_text.strip()
-        # if cleaned_text.startswith('```json'):
-        #     cleaned_text = cleaned_text[7:] # remove the starting ```json, could prompt to not include it
-        # if cleaned_text.startswith('```'): 
+        cleaned_text = gemini_raw_text.strip()
+        if cleaned_text.startswith('```json'):
+            cleaned_text = cleaned_text[7:] # remove the starting ```json, could prompt to not include it
+        # if cleaned_text.startswith('```'):  # tried to prompt to exclude, but still did it
         #     cleaned_text = cleaned_text[3:]
-        # if cleaned_text.endswith('```'):
-        #     cleaned_text = cleaned_text[:-3]
-        # cleaned_text = cleaned_text.strip()
+        if cleaned_text.endswith('```'):
+            cleaned_text = cleaned_text[:-3]
+        cleaned_text = cleaned_text.strip() # strip white space again after '''json removal
 
-        # print("=== CLEANED RESPONSE ===")
-        # print(cleaned_text)
+        print("=== CLEANED RESPONSE ===")
+        print(cleaned_text)
 
-        if not gemini_raw_text.startswith('{'): # basic check to see if response is JSON
+        if not cleaned_text.startswith('{'): # basic check to see if response is JSON
             print("ERROR: Response doesn't start with '{'")
             # Return a fallback response for the hackathon
             return create_fallback_response(sector)
 
-        convert = json.loads(gemini_raw_text) # converts JSON to python dictionary, with key being the field names and values being gemini responses
+        convert = json.loads(cleaned_text) # converts JSON to python dictionary, with key being the field names and values being gemini responses
         print("=== SUCCESSFULLY CONVERTED JSON TO PYTHON DICTIONARY ===")
         return convert
         
     except json.JSONDecodeError as e:
         print(f"JSON Decode Error: {e}")
-        print(f"Problematic text: {gemini_raw_text[:500]}...")
+        print(f"Problematic text: {cleaned_text[:500]}...")
         return create_fallback_response(sector)
     except Exception as e:
         print(f"Error calling Gemini: {e}")
