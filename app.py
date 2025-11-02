@@ -88,7 +88,7 @@ def get_gemini_analysis(news_articles, sector): # takes in news articles and sec
         return create_fallback_response(sector)
     except Exception as e:
         print(f"Error calling Gemini: {e}")
-        return create_fallback_response(sector)
+        return create_fallback_response(sector) 
 
 def create_fallback_response(sector):
     """Fallback response when Gemini fails"""
