@@ -1,71 +1,188 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>repl.it</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
-</head>
-<head>
-<style>
-body {background-color: #000000}
-h1 {color: #F8F8FF}
-p {color: #F8F8FF}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrumpPulse AI - Tech Sector Analysis</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border-left: 4px solid #007bff;
+            background-color: #f8f9fa;
+        }
+        .stock-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stock-item {
+            padding: 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .up { color: green; font-weight: bold; }
+        .down { color: red; font-weight: bold; }
+        .consolidate { color: orange; font-weight: bold; }
+        .error {
+            color: red;
+            background: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        #audioPlayer {
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🚀 TrumpPulse AI - Tech Sector Analysis</h1>
+        <p>Tracking Trump's impact on technology stocks</p>
+        
+        <div id="loading" class="loading">
+            <p>📡 Fetching latest news and AI analysis...</p>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <!-- Results will be populated here -->
+        </div>
+        
+        <div id="error" class="error" style="display: none;">
+            <!-- Errors will be shown here -->
+        </div>
+        
+        <audio id="audioPlayer" controls style="display: none;">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
 
-  <section class='nav'>
-    <a href='index.html'>Home</a>
-    <a href='Technology.html'>Technology</a>
-    <a href='Healthcare.html'>Healthcare</a>
-    <a href='Education.html'>Education</a>
-  </section>
+    <script>
+        // Load analysis immediately when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTechAnalysis();
+        });
 
-  <!-- Moving title start  -->
-  <center>
-    <h1 class="ml5">
-      <span class="text-wrapper">
-        <span class="line line1"></span>
-        <span class="letters letters-left">TrumpPulseAI</span>
-        <!-- <span class="letters letters-right">Jennifer Tanekeu & Michelle Amoako</span> -->
-        <span class="line line2"></span>
-      </span>
-    </h1>
-  </center>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+        async function loadTechAnalysis() {
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ sector: 'technology' }) // Still send sector for consistency
+                });
 
+                const data = await response.json();
 
-<center>
-  <section class='header-section'>
-    <h1 class='header1'>What is Trump doing?</h1>
-    <!-- <h1 class='header1'>Technology</h1> -->
-  </section>
-  <p> Hello! Welcome to our website. Trump is currently our president, and oddly our stocks have been going up and down!</p>
-  <p> We decided to make a website to track what Trump is doing and how it affects the stock market.  We hope you enjoy our website!</p>
-  <img src="https://pngimg.com/uploads/donald_trump/donald_trump_PNG54.png" alt="Trump" style="float:right; margin-right:20px; width=300" height="400">
-</center>
-</body>
-<body>
-    <!-- <div class=""sector-selection">
-      <button data=sector="Technology"> Technology</button></div>  
-      <button data-sector="Healthcare"> Healthcare</button></div>
-      <button data-sector="Education"> Education</button></div>
-    </div> -->
-    <div id="results" class"hidden"></div>
-        <h2>Analysis for <span id="selected-sector-disaplay"></span></h2>
-        <p><strong>Sentiment:</strong> <span id="sentiment"></span></p>
-            <p><strong>Short-Term Outlook:</strong> <span id="short-term"></span></p>
-            <p><strong>Long-Term Outlook:</strong> <span id="long-term"></span></p>
-            <p><strong>Affected Stocks:</strong> <span id="stocks"></span></p>
-            <h3>Financial Summary:</h3>
-            <p id="news-summary"></p>
-            <audio id="audio-player" controls autoplay></audio>
-        </div> 
-        <div id="result">Analyzing the latest technology sector news...</div>
-    <script src="script.js"></script>
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to fetch analysis');
+                }
+
+                // Hide loading, show results
+                document.getElementById('loading').style.display = 'none';
+                displayResults(data);
+                
+                // Generate audio (you can add Eleven Labs here later)
+                // await generateAudio(data.newsSummary);
+                
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `Error: ${error.message}`;
+                console.error('Error:', error);
+            }
+        }
+
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            // Create movement class helper
+            function getMovementClass(movement) {
+                if (movement.toLowerCase().includes('up')) return 'up';
+                if (movement.toLowerCase().includes('down')) return 'down';
+                if (movement.toLowerCase().includes('consolidat')) return 'consolidate';
+                return '';
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="section">
+                    <h2>📊 Overall Sentiment: <span class="${getMovementClass(data.sentiment)}">${data.sentiment}</span></h2>
+                    <p>${data.whySentiment}</p>
+                </div>
+
+                <div class="section">
+                    <h3>⏰ Short-Term Outlook: <span class="${getMovementClass(data.shortTermOutlook)}">${data.shortTermOutlook}</span></h3>
+                    <p>${data.whyShortTermOutlook}</p>
+                </div>
+
+                <div class="section">
+                    <h3>📈 Long-Term Outlook: <span class="${getMovementClass(data.longTermOutlook)}">${data.longTermOutlook}</span></h3>
+                    <p>${data.whyLongTermOutlook}</p>
+                </div>
+
+                <div class="section">
+                    <h3>💼 Stocks to Watch</h3>
+                    <div class="stock-list">
+                        ${data.stocksAffected.map(stock => `
+                            <div class="stock-item">
+                                <strong>${stock.ticker}</strong><br>
+                                <span class="${getMovementClass(stock.movement)}">${stock.movement}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>📰 AI News Summary</h3>
+                    <p>${data.newsSummary}</p>
+                </div>
+            `;
+        }
+
+        // Placeholder for Eleven Labs integration
+        async function generateAudio(text) {
+            // You'll implement Eleven Labs here
+            console.log('Would generate audio for:', text.substring(0, 100) + '...');
+            // const response = await fetch('/generate-audio', {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ text: text })
+            // });
+            // const audioBlob = await response.blob();
+            // const audioUrl = URL.createObjectURL(audioBlob);
+            // document.getElementById('audioPlayer').src = audioUrl;
+            // document.getElementById('audioPlayer').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
