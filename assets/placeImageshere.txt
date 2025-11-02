@@ -1,0 +1,3 @@
+Place image file for the web UI inside the images folder.
+The assets folder is for images, css, and javascript files.
+For now web app will be locall, plans to make it a publcly facing domain everntually.
