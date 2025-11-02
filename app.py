@@ -148,7 +148,7 @@ def get_news_articles(query, lang='en', page_size=5):
 #         print(f"Error parsing Gemini output: {e}")
 #         return None
 
-app = Flask(__name__, static_folder='static', template_folder-'templates') # create a Flask app instance, where to look for templates and static files
+app = Flask(__name__, static_folder='static', template_folder='templates') # create a Flask app instance, where to look for templates and static files
 CORS(app)
 
 @app.route('/')  # displays home page at root URL ('index.html')
